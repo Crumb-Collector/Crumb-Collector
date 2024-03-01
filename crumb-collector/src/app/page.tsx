@@ -1,94 +1,54 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import { ChangeEvent, useState } from 'react';
+import styles from './page.module.css';
+import { PortfolioResponse } from '../../interfaces/interfaces';
+import { handlePortfolioSubmit } from '../../utils'; // Update the import path accordingly
+import { AssetTable } from '../../components/table';
 
 export default function Home() {
+  const [address, setAddress] = useState<string>('');
+  //MAybe remove error response from this type
+  const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+      <div>
+        <form
+          onSubmit={(event) =>
+            handlePortfolioSubmit(
+              event,
+              address,
+              setIsLoading,
+              setError,
+              setPortfolio
+            )
+          }
         >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+          <input
+            type="text"
+            value={address}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setAddress(e.target.value)
+            }
+            placeholder="Enter wallet address"
+          />
+          <button type="submit">Fetch Portfolio</button>
+        </form>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+        {isLoading && <p>Loading...</p>}
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
+        {error && <p>Error: {error}</p>}
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+        {portfolio && (
+          <div>
+            {/* Render portfolio data here */}
+            {/* <pre>{JSON.stringify(portfolio, null, 2)}</pre> */}
+            <AssetTable portfolioData={portfolio} />
+          </div>
+        )}
       </div>
     </main>
   );
