@@ -20,8 +20,9 @@ export default function InstructionsComponent() {
           <h3>Pick up your mess! Collect those coins ...</h3>
         </div>
       </header>
+      
       <div className={styles.buttons_container}>
-        <form
+        <form 
           onSubmit={(event) =>
             handlePortfolioSubmit(
               event,
@@ -40,7 +41,7 @@ export default function InstructionsComponent() {
             }
             placeholder="Enter wallet address"
           />
-          <button type="submit">Fetch Portfolio</button>
+          <button className={styles.button} type="submit"><p>Fetch Portfolio</p>Fetch Portfolio</button>
         </form>
 
         {isLoading && <p>Loading...</p>}
