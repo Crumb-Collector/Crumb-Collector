@@ -1,6 +1,6 @@
 'use client';
 
-import { ErrorResponse, PortfolioResponse } from './interfaces/interfaces';
+import { ErrorResponse, PortfolioResponse } from './interfaces';
 
 export const handlePortfolioSubmit = async (
   event: React.FormEvent<HTMLFormElement>,
