@@ -3,7 +3,7 @@
 import { ChangeEvent, useState } from 'react';
 import styles from './page.module.css';
 import { PortfolioResponse } from './components/instructionsComponent/interfaces';
-import { handlePortfolioSubmit } from './components/instructionsComponent/utils'; // Update the import path accordingly
+import { handlePortfolioSubmit } from './utils/utils'; // Update the import path accordingly
 import { AssetTable } from './components/instructionsComponent/table';
 
 export default function Home() {

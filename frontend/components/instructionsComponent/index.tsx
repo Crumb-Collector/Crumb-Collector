@@ -2,10 +2,10 @@ import styles from './instructionsComponent.module.css';
 import { ChangeEvent, useState } from 'react';
 import { PortfolioResponse } from './interfaces';
 import {
-  extractTokenAddressToChainMap,
+  extractTokenAddressToChainArray,
   handleConfirmSelection,
   handlePortfolioSubmit,
-} from './utils'; // Update the import path accordingly
+} from '../../utils/utils'; // Update the import path accordingly
 import { AssetAccordion } from './table';
 
 export default function InstructionsComponent() {
@@ -18,7 +18,7 @@ export default function InstructionsComponent() {
   if (portfolio) {
     console.log(
       'Address to Chain Mapping:',
-      extractTokenAddressToChainMap(portfolio)
+      extractTokenAddressToChainArray(portfolio)
     );
   }
 
@@ -67,7 +67,7 @@ export default function InstructionsComponent() {
             {/* Render portfolio data here */}
             <AssetAccordion
               portfolioData={portfolio}
-              onConfirmSelection={handleConfirmSelection}
+              onConfirmSelection={handleConfirmSelection(portfolio)}
             />
           </div>
         )}

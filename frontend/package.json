@@ -19,6 +19,7 @@
     "encoding": "^0.1.13",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.4",
+    "ethers": "^6.11.1",
     "framer-motion": "^11.0.8",
     "fs": "^0.0.1-security",
     "lokijs": "^1.5.12",
