@@ -5,3 +5,14 @@
 .asset_table {
   color: black;
 }
+
+.asset_table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.asset_table th,
+.asset_table td {
+  text-align: left;
+  width: 20%; /* Adjust the percentage based on the number of columns */
+}

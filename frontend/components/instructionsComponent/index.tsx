@@ -7,10 +7,11 @@ import {
   handlePortfolioSubmit,
 } from './utils'; // Update the import path accordingly
 import { AssetAccordion } from './table';
+import { useAccount } from 'wagmi';
 
 export default function InstructionsComponent() {
   const [address, setAddress] = useState<string>('');
-  //MAybe remove error response from this type
+  //Maybe remove error response from this type
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +22,7 @@ export default function InstructionsComponent() {
       extractTokenAddressToChainMap(portfolio)
     );
   }
+  
 
   return (
     <div className={styles.container}>
@@ -72,6 +74,20 @@ export default function InstructionsComponent() {
           </div>
         )}
       </div>
+      <div className={styles.header_container}><h3>Where you wanna send those <span>CUMMY COOKIES</span>?</h3></div>
+      <input
+            type="text"
+            value={address}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setAddress(e.target.value)
+            }
+            placeholder="Enter destination address"
+          />
+          <button type="submit">
+            Send
+          </button>
     </div>
   );
 }
+
+

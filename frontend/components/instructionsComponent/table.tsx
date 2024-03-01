@@ -9,7 +9,15 @@ import {
   AccordionIcon,
   Box,
   Button,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
 } from '@chakra-ui/react';
+import { useAccount } from "wagmi";
+
 
 interface TableProps {
   portfolioData: PortfolioResponse;
@@ -23,6 +31,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
   onConfirmSelection,
 }) => {
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
+  const { isConnecting, isDisconnected } = useAccount();
 
   // Group positions by chain ID
   const positionsByChain = portfolioData.data.reduce((acc: any, position) => {
@@ -51,7 +60,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
   };
 
   return (
-    <Accordion allowMultiple>
+    <Accordion allowMultiple defaultIndex={[0]} style={{ width: '800px' }}>
       {Object.entries(positionsByChain).map(([chainId, positions]) => (
         <AccordionItem key={chainId}>
           <h2>
@@ -63,20 +72,20 @@ export const AssetAccordion: React.FC<TableProps> = ({
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            <table className={styles.asset_table}>
-              <thead>
-                <tr>
-                  <th>Select</th>
-                  <th>Name</th>
-                  <th>Symbol</th>
-                  <th>Address</th>
-                  <th>Value (USD)</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table className={styles.asset_table}>
+              <Thead>
+                <Tr>
+                  <Th>Select</Th>
+                  <Th>Name</Th>
+                  <Th>Symbol</Th>
+                  <Th>Address</Th>
+                  <Th>Value (USD)</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
                 {positions.map((position: Position) => (
-                  <tr key={position.id}>
-                    <td>
+                  <Tr key={position.id}>
+                    <Td>
                       <input
                         type="checkbox"
                         checked={!!selectedRows[position.id]}
@@ -87,24 +96,26 @@ export const AssetAccordion: React.FC<TableProps> = ({
                           )
                         }
                       />
-                    </td>
-                    <td>{position.attributes.fungible_info.name}</td>
-                    <td>{position.attributes.fungible_info.symbol}</td>
-                    <td>
+                    </Td>
+                    <Td>{position.attributes.fungible_info.name}</Td>
+                    <Td>{position.attributes.fungible_info.symbol}</Td>
+                    <Td>
                       {position.attributes.fungible_info.implementations[0]
                         ?.address || 'N/A'}
-                    </td>
-                    <td>{position.attributes.value?.toFixed(2) || 'N/A'}</td>
-                  </tr>
+                    </Td>
+                    <Td>{position.attributes.value?.toFixed(2) || 'N/A'}</Td>
+                  </Tr>
                 ))}
-              </tbody>
-            </table>
-            <Button mt={4} onClick={() => handleConfirmSelection(chainId)}>
+              </Tbody>
+            </Table>
+            <Button mt={4} onClick={() => handleConfirmSelection(chainId)}
+            isDisabled={isConnecting || isDisconnected}>
               Confirm Selection
             </Button>
           </AccordionPanel>
         </AccordionItem>
       ))}
     </Accordion>
+  
   );
 };
