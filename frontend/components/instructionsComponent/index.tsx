@@ -1,16 +1,60 @@
 import styles from "./instructionsComponent.module.css";
+import { ChangeEvent, useState } from 'react';
+import { PortfolioResponse } from './interfaces';
+import { handlePortfolioSubmit } from './utils'; // Update the import path accordingly
+import { AssetTable } from "./table";
 
 export default function InstructionsComponent() {
+  const [address, setAddress] = useState<string>('');
+  //MAybe remove error response from this type
+  const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   return (
     <div className={styles.container}>
       <header className={styles.header_container}>
         <div className={styles.header}>
           <h1>
-            create<span>-web3-dapp</span>
+            <span>CRUMB COLLECTOR</span>
           </h1>
-          <h3>The ultimate solution to create web3 applications</h3>
+          <h3>Pick up your mess! Collect those coins ...</h3>
         </div>
       </header>
+      <div className={styles.buttons_container}>
+        <form
+          onSubmit={(event) =>
+            handlePortfolioSubmit(
+              event,
+              address,
+              setIsLoading,
+              setError,
+              setPortfolio
+            )
+          }
+        >
+          <input
+            type="text"
+            value={address}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setAddress(e.target.value)
+            }
+            placeholder="Enter wallet address"
+          />
+          <button type="submit">Fetch Portfolio</button>
+        </form>
+
+        {isLoading && <p>Loading...</p>}
+
+        {error && <p>Error: {error}</p>}
+
+        {portfolio && (
+          <div>
+            {/* Render portfolio data here */}
+            {/* <pre>{JSON.stringify(portfolio, null, 2)}</pre> */}
+            <AssetTable portfolioData={portfolio} />
+          </div>
+        )}
+      </div>
 
       <div className={styles.buttons_container}>
         <a
@@ -51,9 +95,6 @@ export default function InstructionsComponent() {
           </div>
         </a>
       </div>
-      <p className={styles.get_started}>
-        Get started by editing this page in <span>/pages/index.js</span>
-      </p>
     </div>
   );
 }

@@ -2,9 +2,9 @@
 
 import { ChangeEvent, useState } from 'react';
 import styles from './page.module.css';
-import { PortfolioResponse } from './interfaces';
-import { handlePortfolioSubmit } from './utils'; // Update the import path accordingly
-import { AssetTable } from './table';
+import { PortfolioResponse } from './components/instructionsComponent/interfaces';
+import { handlePortfolioSubmit } from './components/instructionsComponent/utils'; // Update the import path accordingly
+import { AssetTable } from './components/instructionsComponent/table';
 
 export default function Home() {
   const [address, setAddress] = useState<string>('');

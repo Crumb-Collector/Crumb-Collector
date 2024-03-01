@@ -1,4 +1,4 @@
-import { PortfolioResponse, Position } from '@/interfaces/interfaces';
+import { PortfolioResponse, Position } from './interfaces';
 import React from 'react';
 
 interface TableProps {
