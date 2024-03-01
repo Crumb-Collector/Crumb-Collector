@@ -6,7 +6,7 @@ import {
   handleConfirmSelection,
   handlePortfolioSubmit,
 } from './utils'; // Update the import path accordingly
-import { AssetTable } from './table';
+import { AssetAccordion } from './table';
 
 export default function InstructionsComponent() {
   const [address, setAddress] = useState<string>('');
@@ -65,7 +65,7 @@ export default function InstructionsComponent() {
         {portfolio && (
           <div>
             {/* Render portfolio data here */}
-            <AssetTable
+            <AssetAccordion
               portfolioData={portfolio}
               onConfirmSelection={handleConfirmSelection}
             />
