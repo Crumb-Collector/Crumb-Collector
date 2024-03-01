@@ -1,8 +1,12 @@
-import styles from "./instructionsComponent.module.css";
+import styles from './instructionsComponent.module.css';
 import { ChangeEvent, useState } from 'react';
 import { PortfolioResponse } from './interfaces';
-import { handlePortfolioSubmit } from './utils'; // Update the import path accordingly
-import { AssetTable } from "./table";
+import {
+  extractTokenAddressToChainMap,
+  handleConfirmSelection,
+  handlePortfolioSubmit,
+} from './utils'; // Update the import path accordingly
+import { AssetTable } from './table';
 
 export default function InstructionsComponent() {
   const [address, setAddress] = useState<string>('');
@@ -10,6 +14,14 @@ export default function InstructionsComponent() {
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (portfolio) {
+    console.log(
+      'Address to Chain Mapping:',
+      extractTokenAddressToChainMap(portfolio)
+    );
+  }
+
   return (
     <div className={styles.container}>
       <header className={styles.header_container}>
@@ -20,9 +32,9 @@ export default function InstructionsComponent() {
           <h3>Pick up your mess! Collect those coins ...</h3>
         </div>
       </header>
-      
+
       <div className={styles.buttons_container}>
-        <form 
+        <form
           onSubmit={(event) =>
             handlePortfolioSubmit(
               event,
@@ -41,7 +53,9 @@ export default function InstructionsComponent() {
             }
             placeholder="Enter wallet address"
           />
-          <button className={styles.button} type="submit"><p>Fetch Portfolio</p>Fetch Portfolio</button>
+          <button className={styles.button} type="submit">
+            <p>Fetch Portfolio</p>Fetch Portfolio
+          </button>
         </form>
 
         {isLoading && <p>Loading...</p>}
@@ -51,16 +65,18 @@ export default function InstructionsComponent() {
         {portfolio && (
           <div>
             {/* Render portfolio data here */}
-            {/* <pre>{JSON.stringify(portfolio, null, 2)}</pre> */}
-            <AssetTable portfolioData={portfolio} />
+            <AssetTable
+              portfolioData={portfolio}
+              onConfirmSelection={handleConfirmSelection}
+            />
           </div>
         )}
       </div>
 
       <div className={styles.buttons_container}>
         <a
-          target={"_blank"}
-          href={"https://createweb3dapp.alchemy.com/#components"}
+          target={'_blank'}
+          href={'https://createweb3dapp.alchemy.com/#components'}
         >
           <div className={styles.button}>
             {/* <img src="https://static.alchemyapi.io/images/cw3d/Icon%20Medium/lightning-square-contained-m.svg" width={"20px"} height={"20px"} /> */}
@@ -68,8 +84,8 @@ export default function InstructionsComponent() {
           </div>
         </a>
         <a
-          target={"_blank"}
-          href={"https://createweb3dapp.alchemy.com/#templates"}
+          target={'_blank'}
+          href={'https://createweb3dapp.alchemy.com/#templates'}
         >
           <div className={styles.button}>
             {/* <img src="https://static.alchemyapi.io/images/cw3d/Icon%20Medium/lightning-square-contained-m.svg" width={"20px"} height={"20px"} /> */}
@@ -77,14 +93,14 @@ export default function InstructionsComponent() {
           </div>
         </a>
         <a
-          target={"_blank"}
-          href={"https://docs.alchemy.com/docs/create-web3-dapp"}
+          target={'_blank'}
+          href={'https://docs.alchemy.com/docs/create-web3-dapp'}
         >
           <div className={styles.button}>
             <img
               src="https://static.alchemyapi.io/images/cw3d/Icon%20Large/file-eye-01-l.svg"
-              width={"20px"}
-              height={"20px"}
+              width={'20px'}
+              height={'20px'}
             />
             <p>Visit Docs</p>
           </div>
