@@ -18,12 +18,12 @@ export async function getPortfolio(address: string) {
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
-    response.headers.set("Access-Control-Allow-Origin", "*");
-    response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    response.headers.set(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    );
+    // response.headers.set("Access-Control-Allow-Origin", "*");
+    // response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    // response.headers.set(
+    //   "Access-Control-Allow-Headers",
+    //   "Content-Type, Authorization"
+    // );
     const data: PortfolioResponse = await response.json();
     // console.log("portfolio", data);
     return data;
