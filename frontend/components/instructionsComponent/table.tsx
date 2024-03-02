@@ -22,9 +22,7 @@ import { formatHash } from '../../utils/utils';
 
 interface TableProps {
   portfolioData: PortfolioResponse;
-  onConfirmSelection: (
-    selectedAssets: Array<{ chainId: string; tokenAddress: string }>
-  ) => void;
+  onConfirmSelection: (selectedAssets: Position[]) => void;
 }
 
 export const AssetAccordion: React.FC<TableProps> = ({
@@ -35,11 +33,14 @@ export const AssetAccordion: React.FC<TableProps> = ({
   const { isConnecting, isDisconnected } = useAccount();
 
   // Group positions by chain ID
-  const positionsByChain = portfolioData.data.reduce((acc: any, position) => {
+  var positionsByChain: Record<string, Position[]> = {};
+  portfolioData.data.forEach((position) => {
     const { id } = position.relationships.chain.data;
-    acc[id] = acc[id] ? [...acc[id], position] : [position];
-    return acc;
+    positionsByChain[id] = positionsByChain[id]
+      ? [...positionsByChain[id], position]
+      : [position];
   }, {});
+  console.log('positionsByChain', positionsByChain);
 
   const handleRowSelectionChange = (
     chainId: string,
@@ -56,14 +57,17 @@ export const AssetAccordion: React.FC<TableProps> = ({
   };
 
   const handleConfirmSelection = (chainId: string) => {
-    const selectedPositions = positionsByChain[chainId].filter(
-      (position) => selectedRowsByChain[chainId]?.[position.id]
+    const selectedAssets = portfolioData.data.filter(
+      (position) =>
+        selectedRows[position.id] &&
+        position.relationships.chain.data.id === chainId
     );
-    const selectedAssets = selectedPositions.map((position) => ({
-      chainId: position.relationships.chain.data.id,
-      tokenAddress:
-        position.attributes.fungible_info.implementations[0]?.address || '',
-    }));
+    // .map((position) => ({
+    //   chainId: position.relationships.chain.data.id,
+    //   tokenAddress:
+    //     position.attributes.fungible_info.implementations[0]?.address || '',
+    // }));
+    console.log('selected assets', selectedAssets);
     onConfirmSelection(selectedAssets);
   };
   const [selectedRowsByChain, setSelectedRowsByChain] = useState<
