@@ -16,6 +16,7 @@
     "@types/node": "20.2.5",
     "@types/react": "18.2.9",
     "@types/react-dom": "18.2.4",
+    "@verax-attestation-registry/verax-sdk": "^1.1.1",
     "@web3modal/wagmi": "^4.0.11",
     "encoding": "^0.1.13",
     "eslint": "8.42.0",

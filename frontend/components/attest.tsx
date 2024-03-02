@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { type BaseError, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
-import { Address, erc20Abi as abi } from 'viem'
-import PortalContract from '../../frontend/utils/PortalContract.json'
-import { ethers } from 'ethers'
+import { type BaseError, useWriteContract } from 'wagmi'
+import { Address, } from 'viem'
+import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
+
+const veraxSdk = new VeraxSdk(VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND);
 
 export function SendAttestation() {
     const {
@@ -15,41 +16,35 @@ export function SendAttestation() {
     async function submit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         const formData = new FormData(e.target as HTMLFormElement)
-        const address = "0xc6d98f3c28e28c87f5dba70358ec34b5825810c8"
-        const schemaId = "347D0856D7B7522726D8662FD72CAB5AF9CF9E8E37BC5C9E55455AD62749E406" // Assuming schemaId is a string that represents bytes32
-        const expirationDate = Math.floor(Date.now() / 1000) + 2592000 // Assuming expirationDate is a number representing uint64
-        const subject = "change in identity" // Encoding string to bytes
-
         // Retrieve oldAddress (connected to the application) and newAddress from form data
         const oldAddress = formData.get('oldAddress') as Address // Assuming this is provided or obtained elsewhere in your application
         const newAddress = formData.get('newAddress') as Address
-
-        // Assuming the contract expects attestationData as a bytes array containing the two addresses
-        // Note: This step might need adjustment based on how your contract handles bytes input
-        const attestationData = [oldAddress, newAddress]
-
-        const validationPayloads = [""] // Populate this array based on your application's logic
-
-        const attestationPayload = [schemaId, expirationDate, subject, attestationData]
-
-        writeContract({
-            address,
-            abi: PortalContract,
-            functionName: 'attest',
-            args: [attestationPayload, validationPayloads],
-            value: BigInt(0)
-        })
+        const portalAddress = "0xc6d98f3c28e28c87f5dba70358ec34b5825810c8";
+        const schemaId = "0x347D0856D7B7522726D8662FD72CAB5AF9CF9E8E37BC5C9E55455AD62749E406".toLowerCase();
+        const attestationPayload = {
+            schemaId,
+            expirationDate: 18446744073709551616, // 2 ^ 53 max value
+            subject: "0x6368616e676520696e206964656e74697479",
+            attestationData: [{ oldAddress }, { newAddress }],
+        };
+        const schem = await veraxSdk.schema.getSchema(schemaId)
+        const port = await veraxSdk.portal.getPortalByAddress(portalAddress)
+        veraxSdk.schema.typeName
+        console.log(schem);
+        console.log(port);
+        const validationPayloads: string[] = [];
+        const newAttestation = await veraxSdk.portal.attest(portalAddress, attestationPayload, validationPayloads);
+        console.log(newAttestation);
     }
 
-    const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
 
     return (
         <form onSubmit={submit}>
-            <label>Send Attestation</label>
-            <input name="contractAddress" placeholder="Contract Address" required />
-            <input name="schemaId" placeholder="Schema ID" required />
-            <input name="expirationDate" placeholder="Expiration Date" required />
-            <input name="subject" placeholder="Subject" required />
+            <label>Attest that you've changed wallets! </label>
+            {/* <input name="contractAddress" placeholder="Contract Address" required /> */}
+            {/* <input name="schemaId" placeholder="Schema ID" required /> */}
+            {/* <input name="expirationDate" placeholder="Expiration Date" required /> */}
+            {/* <input name="subject" placeholder="Subject" required /> */}
             <input name="oldAddress" placeholder="Old Address" required />
             <input name="newAddress" placeholder="New Address" required />
             {/* Add inputs or logic for validationPayloads as necessary */}
@@ -57,8 +52,6 @@ export function SendAttestation() {
                 {isPending ? 'Confirming...' : 'Send Attestation'}
             </button>
             {hash && <div>Transaction Hash: {hash}</div>}
-            {isConfirming && <div>Waiting for confirmation...</div>}
-            {isConfirmed && <div>Transaction confirmed.</div>}
             {error && (
                 <div>Error: {(error as BaseError).shortMessage || error.message}</div>
             )}
