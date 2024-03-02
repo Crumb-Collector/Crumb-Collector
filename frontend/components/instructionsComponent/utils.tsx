@@ -1,10 +1,11 @@
 'use client';
 
+import { Address } from 'wagmi';
 import { ErrorResponse, PortfolioResponse } from './interfaces';
 
 export const handlePortfolioSubmit = async (
   event: React.FormEvent<HTMLFormElement>,
-  address: string,
+  address: Address,
   setIsLoading: (isLoading: boolean) => void,
   setError: (error: string | null) => void,
   setPortfolio: (portfolio: PortfolioResponse | null) => void
