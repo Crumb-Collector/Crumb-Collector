@@ -1,15 +1,13 @@
 
-'use client'
+"use client";
 
-import { ConnectKitButton } from "connectkit";
+import ConnectButton from "@/components/connect-button";
 import styles from "./Navbar.module.css";
 export default function Navbar() {
   return (
     <nav className={styles.navbar}>
-      <a href="https://alchemy.com/?a=create-web3-dapp" target={"_blank"}>
-        <p>Cookie CUM Collectors</p>
-      </a>
-      <ConnectKitButton />
+      <p>OOPS! Coin Collectors</p>
+      <ConnectButton />
     </nav>
   );
 }

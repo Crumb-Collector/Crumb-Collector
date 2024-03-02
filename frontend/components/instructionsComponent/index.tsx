@@ -7,10 +7,13 @@ import {
   handlePortfolioSubmit,
 } from '../../utils/utils'; // Update the import path accordingly
 import { AssetAccordion } from './table';
+import { useAccount } from 'wagmi';
+import { Button, ButtonGroup } from '@chakra-ui/react';
+import { ChakraProvider, Center, Input, useDisclosure } from '@chakra-ui/react';
 
 export default function InstructionsComponent() {
   const [address, setAddress] = useState<string>('');
-  //MAybe remove error response from this type
+  //Maybe remove error response from this type
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,13 +30,12 @@ export default function InstructionsComponent() {
       <header className={styles.header_container}>
         <div className={styles.header}>
           <h1>
-            <span>CRUMB COLLECTOR</span>
+            <span>OOPS!</span>
           </h1>
-          <h3>Pick up your mess! Collect those coins ...</h3>
+          <h3>Pick up your mess! Save those coins ...</h3>
         </div>
       </header>
-
-      <div className={styles.buttons_container}>
+      <div>
         <form
           onSubmit={(event) =>
             handlePortfolioSubmit(
@@ -45,17 +47,21 @@ export default function InstructionsComponent() {
             )
           }
         >
-          <input
-            type="text"
-            value={address}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setAddress(e.target.value)
-            }
-            placeholder="Enter wallet address"
-          />
-          <button className={styles.button} type="submit">
-            <p>Fetch Portfolio</p>Fetch Portfolio
-          </button>
+          <Center>
+            <Input
+              w="430px"
+              m={2}
+              type="text"
+              value={address}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setAddress(e.target.value)
+              }
+              placeholder="Enter wallet address"
+            />
+            <Button colorScheme="teal" type="submit">
+              Fetch Portfolio
+            </Button>
+          </Center>
         </form>
 
         {isLoading && <p>Loading...</p>}
@@ -72,46 +78,28 @@ export default function InstructionsComponent() {
           </div>
         )}
       </div>
-
-      <div className={styles.buttons_container}>
-        <a
-          target={'_blank'}
-          href={'https://createweb3dapp.alchemy.com/#components'}
-        >
-          <div className={styles.button}>
-            {/* <img src="https://static.alchemyapi.io/images/cw3d/Icon%20Medium/lightning-square-contained-m.svg" width={"20px"} height={"20px"} /> */}
-            <p>Add Components</p>
+      {portfolio && (
+        <div>
+          <div className={styles.header_container}>
+            <h3>
+              Where you wanna send those <span>CUMMY COOKIES</span>?
+            </h3>
           </div>
-        </a>
-        <a
-          target={'_blank'}
-          href={'https://createweb3dapp.alchemy.com/#templates'}
-        >
-          <div className={styles.button}>
-            {/* <img src="https://static.alchemyapi.io/images/cw3d/Icon%20Medium/lightning-square-contained-m.svg" width={"20px"} height={"20px"} /> */}
-            <p>Explore Templates</p>
-          </div>
-        </a>
-        <a
-          target={'_blank'}
-          href={'https://docs.alchemy.com/docs/create-web3-dapp'}
-        >
-          <div className={styles.button}>
-            <img
-              src="https://static.alchemyapi.io/images/cw3d/Icon%20Large/file-eye-01-l.svg"
-              width={'20px'}
-              height={'20px'}
-            />
-            <p>Visit Docs</p>
-          </div>
-        </a>
-        <a>
-          <div className={styles.button}>
-            {/* <img src="https://static.alchemyapi.io/images/cw3d/Icon%20Medium/lightning-square-contained-m.svg" width={"20px"} height={"20px"} /> */}
-            <p>Contribute</p>
-          </div>
-        </a>
-      </div>
+          <Input
+            w="430px"
+            m={2}
+            type="text"
+            value={address}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setAddress(e.target.value)
+            }
+            placeholder="Enter destination address"
+          />
+          <Button colorScheme="teal" type="submit">
+            Sumbit
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

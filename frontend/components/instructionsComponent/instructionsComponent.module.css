@@ -2,7 +2,7 @@
 	display: flex;
 	flex-direction: column;
 	width: 100%;
-    height: 550px;
+    
 	align-items: center;
     justify-content: space-between;
     
@@ -32,7 +32,11 @@
 	background-clip: text;
 	color: transparent;
 }
-
+.header_container h3 span{
+	background: linear-gradient(140deg, rgba(54,190,255,1) 0%, rgba(115,63,241,1) 100%);
+	background-clip: text;
+	color: transparent;
+}
 .get_started{
 	font-size: 18px;
 

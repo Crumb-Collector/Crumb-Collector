@@ -5,3 +5,15 @@
 .asset_table {
   color: black;
 }
+
+.asset_table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.asset_table th,
+.asset_table td {
+  text-align: left;
+  justify-content: center;
+  align-items: center;
+}
