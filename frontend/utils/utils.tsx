@@ -1,12 +1,16 @@
 'use client';
 
-import { PortfolioResponse, Position } from '../components/instructionsComponent/interfaces';
+import {
+  PortfolioResponse,
+  Position,
+} from '../components/instructionsComponent/interfaces';
 import { extractChainIdMapping } from './getChainMapping';
 import { replaceChainIdWithNumber } from './replaceChainIdWithNumber';
+import { Address } from 'viem';
 
-export const handlePortfolioSubmit = async (
+export const getPortfolio = async (
   event: React.FormEvent<HTMLFormElement>,
-  address: string,
+  address: Address,
   setIsLoading: (isLoading: boolean) => void,
   setError: (error: string | null) => void,
   setPortfolio: (portfolio: PortfolioResponse | null) => void
@@ -37,7 +41,7 @@ export const handlePortfolioSubmit = async (
     }
     const data: PortfolioResponse = await response.json();
     setPortfolio(data);
-    console.log(data);
+    console.log("portfolio", data);
   } catch (err) {
     console.error('PortfolioResponseError', err);
     setError(err instanceof Error ? err.message : String(err));
@@ -117,9 +121,7 @@ export const extractTokenAddressToChainArray = (
   return tokenAddressToChainArray;
 };
 
-export const handleConfirmSelection = async (
-  selectedAssets: Position[]
-) => {
+export const handleConfirmSelection = async (selectedAssets: Position[]) => {
   // Take the selectedAssets identified by the user and convert that information into a useful array.
   const keyValueArray: { address: string; chainId: string }[] =
     extractTokenAddressToChainArray(selectedAssets);
@@ -130,7 +132,7 @@ export const handleConfirmSelection = async (
   // Use the Zerion info to update our "keyValueArray"
   const updatedArray = replaceChainIdWithNumber(keyValueArray, chainIdMapping);
 
-  console.log('updated array', updatedArray);
+  console.log('selected assets', updatedArray);
 
   // tokenAddresses.forEach(async (tokenAddress) => {
   //   await transferAllTokens(wallet, tokenAddress, recipient, chainId);
@@ -139,6 +141,7 @@ export const handleConfirmSelection = async (
   // TODO - replace recipient address
   // executeTokenTransfers(keyValueMap, 'RecipientAddress', wallet);
 };
+
 export function formatHash(hash: any, visibleCharacters: number = 6): string {
   if (typeof hash !== 'string' || hash.length <= visibleCharacters * 2) {
     return String(hash);

@@ -3,16 +3,16 @@ import { ChangeEvent, useState, useEffect } from 'react';
 import { PortfolioResponse } from './interfaces';
 import {
   extractTokenAddressToChainArray,
-  handleConfirmSelection,
-  handlePortfolioSubmit,
+  getPortfolio,
 } from '../../utils/utils'; // Update the import path accordingly
 import { AssetAccordion } from './table';
 import { useAccount } from 'wagmi';
 import { Button, Input, Flex, Center } from '@chakra-ui/react'; // Added Flex
+import { Address } from 'viem';
 
 export default function InstructionsComponent() {
-  const [address, setAddress] = useState<string>('');
-  const [toAddress, setToAddress] = useState<string>('');
+  const [address, setAddress] = useState<Address>('0x');
+  const [toAddress, setToAddress] = useState<Address>('0x');
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +25,7 @@ export default function InstructionsComponent() {
   useEffect(() => {
     // Check if wallet is connected and perform action
     if (isConnected && walletAddress) {
-      handlePortfolioSubmit(
+      getPortfolio(
         mockEvent,
         walletAddress,
         setIsLoading,
@@ -61,7 +61,7 @@ export default function InstructionsComponent() {
             {isConnecting || isDisconnected ? (
               <form
                 onSubmit={(event) =>
-                  handlePortfolioSubmit(
+                  getPortfolio(
                     event,
                     address,
                     setIsLoading,
@@ -76,7 +76,7 @@ export default function InstructionsComponent() {
                   type="text"
                   value={address}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setAddress(e.target.value)
+                    setAddress(e.target.value as Address)
                   }
                   placeholder="Enter wallet address"
                 />
@@ -102,21 +102,19 @@ export default function InstructionsComponent() {
             {error && <p>Error: {error}</p>}
 
             {portfolio && (
-              <div>
+              <form>
                 <Input
                   w="430px"
                   m={2}
                   type="text"
+                  name='toAddress'
                   value={toAddress}
                   onChange={(f: ChangeEvent<HTMLInputElement>) =>
-                    setToAddress(f.target.value)
+                    setToAddress(f.target.value as Address)
                   }
                   placeholder="Enter destination address"
                 />
-                <Button colorScheme="teal" width="130px" type="submit">
-                  Submit
-                </Button>
-              </div>
+              </form>
             )}
           </Flex>
         </Center>
@@ -128,7 +126,7 @@ export default function InstructionsComponent() {
             {/* Render portfolio data here */}
             <AssetAccordion
               portfolioData={portfolio}
-              onConfirmSelection={handleConfirmSelection}
+              toAddress={toAddress}
             />
           </Center>
         </div>

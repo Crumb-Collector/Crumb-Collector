@@ -15,20 +15,21 @@ import {
   Tr,
   Th,
   Td,
+  Checkbox,
 } from '@chakra-ui/react';
-import { useAccount } from 'wagmi';
+import { useAccount, useWriteContract } from 'wagmi';
 import { formatHash } from '../../utils/utils';
+import { Address, erc20Abi as abi } from 'viem'
+import { useWaitForTransactionReceipt } from 'wagmi';
 
 interface TableProps {
   portfolioData: PortfolioResponse;
-  onConfirmSelection: (
-    selectedAssets: Position[]
-  ) => void;
+  toAddress: Address
 }
 
 export const AssetAccordion: React.FC<TableProps> = ({
   portfolioData,
-  onConfirmSelection,
+  toAddress
 }) => {
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
   const { isConnecting, isDisconnected } = useAccount();
@@ -37,29 +38,87 @@ export const AssetAccordion: React.FC<TableProps> = ({
   var positionsByChain: Record<string, Position[]> = {};
   portfolioData.data.forEach((position) => {
     const { id } = position.relationships.chain.data;
-    positionsByChain[id] = positionsByChain[id] ? [...positionsByChain[id], position] : [position];
+    positionsByChain[id] = positionsByChain[id]
+      ? [...positionsByChain[id], position]
+      : [position];
   }, {});
-  console.log("positionsByChain", positionsByChain);
+  console.log('positionsByChain', positionsByChain);
 
-  const handleRowSelectionChange = (positionId: string, isChecked: boolean) => {
-    setSelectedRows((prev) => ({ ...prev, [positionId]: isChecked }));
+  const handleRowSelectionChange = (
+    chainId: string,
+    positionId: string,
+    isChecked: boolean
+  ) => {
+    setSelectedRowsByChain((prev) => ({
+      ...prev,
+      [chainId]: {
+        ...(prev[chainId] || {}),
+        [positionId]: isChecked,
+      },
+    }));
   };
 
-  const handleConfirmSelection = (chainId: string) => {
-    const selectedAssets = portfolioData.data
-      .filter(
-        (position) =>
-          selectedRows[position.id] &&
-          position.relationships.chain.data.id === chainId
-      )
-    // .map((position) => ({
-    //   chainId: position.relationships.chain.data.id,
-    //   tokenAddress:
-    //     position.attributes.fungible_info.implementations[0]?.address || '',
-    // }));
-    console.log("selected assets", selectedAssets);
-    onConfirmSelection(selectedAssets);
+  const [selectedRowsByChain, setSelectedRowsByChain] = useState<
+    Record<string, Record<string, boolean>>
+  >({});
+
+  const handleSelectAllChange = (chainId: string, isChecked: boolean) => {
+    const newSelectedRowsForChain: Record<string, boolean> = {};
+    positionsByChain[chainId].forEach((position: Position) => {
+      newSelectedRowsForChain[position.id] = isChecked;
+    });
+    setSelectedRowsByChain((prev) => ({
+      ...prev,
+      [chainId]: newSelectedRowsForChain,
+    }));
   };
+
+  const getSelectAllState = (chainId: string) => {
+    const positions = positionsByChain[chainId];
+    const selectedRows = selectedRowsByChain[chainId] || {};
+    const allChecked = positions.every((position) => selectedRows[position.id]);
+    const isIndeterminate =
+      positions.some((position) => selectedRows[position.id]) && !allChecked;
+    return { allChecked, isIndeterminate };
+  };
+
+  const {
+    data: hash,
+    error,
+    isPending,
+    writeContract
+  } = useWriteContract()
+
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+    const chainId = formData.get('chainId') as string
+    // Ensure we're using the correct state to filter selected assets
+    const selectedPositions = selectedRowsByChain[chainId] || {};
+    const selectedAssets = Object.keys(selectedPositions)
+      .filter((positionId) => selectedPositions[positionId])
+      .map((positionId) => {
+        const position = portfolioData.data.find((p) => p.id === positionId);
+        return {
+          chainId: position?.relationships?.chain?.data?.id ?? '',
+          tokenAddress:
+            position?.attributes?.fungible_info?.implementations[0]?.address ??
+            'native-token',
+          amount: position?.attributes?.quantity?.int ?? '0',
+        };
+      });
+
+    console.log('selectedAssets', selectedAssets);
+    selectedAssets.forEach((asset) => {
+      console.log('send asset to:', toAddress, "asset:", asset);
+      writeContract({
+        address: asset.tokenAddress as Address,
+        abi,
+        functionName: 'transfer',
+        args: [toAddress, BigInt(asset.amount)],
+      })
+    })
+  }
 
   return (
     <Accordion allowToggle width="800px" m="20px">
@@ -74,10 +133,37 @@ export const AssetAccordion: React.FC<TableProps> = ({
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
+            <form onSubmit={submit}>
+              <Button
+                mt={4}
+                px={4}
+                py={2}
+                isDisabled={isConnecting || isDisconnected || isPending}
+                type='submit'
+              >
+                {isConnecting || isDisconnected
+                  ? 'CONNECT WALLET TO CONFIRM'
+                  : isPending ? "tx pending" : `Send Tokens on ${chainId}`}
+              </Button>
+              <input type="hidden" name="chainId" value={chainId} />
+            </form>
             <Table className={styles.asset_table}>
               <Thead>
                 <Tr>
-                  <Th width="14%">Select</Th>
+                  <Th width="14%">
+                    {' '}
+                    <Checkbox
+                      isChecked={getSelectAllState(chainId).allChecked}
+                      isIndeterminate={
+                        getSelectAllState(chainId).isIndeterminate
+                      }
+                      onChange={(e) =>
+                        handleSelectAllChange(chainId, e.target.checked)
+                      }
+                    >
+                      Select
+                    </Checkbox>
+                  </Th>
                   <Th width="23%">Name</Th>
                   <Th width="15%">Symbol</Th>
                   <Th width="23%">Address</Th>
@@ -88,11 +174,13 @@ export const AssetAccordion: React.FC<TableProps> = ({
                 {positions.map((position: Position) => (
                   <Tr key={position.id}>
                     <Td>
-                      <input
-                        type="checkbox"
-                        checked={!!selectedRows[position.id]}
+                      <Checkbox
+                        isChecked={
+                          selectedRowsByChain[chainId]?.[position.id] || false
+                        }
                         onChange={(e) =>
                           handleRowSelectionChange(
+                            chainId,
                             position.id,
                             e.target.checked
                           )
@@ -115,17 +203,6 @@ export const AssetAccordion: React.FC<TableProps> = ({
                 ))}
               </Tbody>
             </Table>
-            <Button
-              mt={4}
-              px={4}
-              py={2}
-              onClick={() => handleConfirmSelection(chainId)}
-              isDisabled={isConnecting || isDisconnected}
-            >
-              {isConnecting || isDisconnected
-                ? 'CONNECT WALLET TO CONFIRM'
-                : 'Confirm Selection'}
-            </Button>
           </AccordionPanel>
         </AccordionItem>
       ))}
