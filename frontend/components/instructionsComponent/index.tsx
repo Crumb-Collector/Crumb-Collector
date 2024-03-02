@@ -9,7 +9,7 @@ import {
 import { AssetAccordion } from './table';
 import { useAccount } from 'wagmi';
 import { Button, ButtonGroup } from '@chakra-ui/react';
-import { ChakraProvider, Center, Input, useDisclosure} from '@chakra-ui/react';
+import { ChakraProvider, Center, Input, useDisclosure, useToast} from '@chakra-ui/react';
 
 
 export default function InstructionsComponent() {
