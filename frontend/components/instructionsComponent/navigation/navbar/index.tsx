@@ -6,9 +6,7 @@ import styles from "./Navbar.module.css";
 export default function Navbar() {
   return (
     <nav className={styles.navbar}>
-      <a href="https://alchemy.com/?a=create-web3-dapp" target={"_blank"}>
-        <p>Cookie CUM Collectors</p>
-      </a>
+        <p>OOPS! Coin Collectors</p>
       <ConnectKitButton />
     </nav>
   );

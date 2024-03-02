@@ -61,13 +61,13 @@ export const AssetAccordion: React.FC<TableProps> = ({
   };
 
   return (
-    <Accordion allowMultiple defaultIndex={[0]} style={{ width: '800px' }}>
+    <Accordion defaultIndex={[0]} maxW="800px" m="20px" >
       {Object.entries(positionsByChain).map(([chainId, positions]) => (
         <AccordionItem key={chainId}>
           <h2>
             <AccordionButton>
-              <Box flex="1" textAlign="left">
-                Chain: {chainId}
+              <Box flex="1" textAlign="left" fontWeight="bold">
+               {chainId.charAt(0).toUpperCase() + chainId.slice(1)}
               </Box>
               <AccordionIcon />
             </AccordionButton>
@@ -76,11 +76,11 @@ export const AssetAccordion: React.FC<TableProps> = ({
             <Table className={styles.asset_table}>
               <Thead>
                 <Tr>
-                  <Th style={{ width: '8%' }} >Select</Th>
-                  <Th>Name</Th>
-                  <Th>Symbol</Th>
-                  <Th>Address</Th>
-                  <Th>Value (USD)</Th>
+                  <Th width="14%">Select</Th>
+                  <Th width="23%">Name</Th>
+                  <Th width="15%">Symbol</Th>
+                  <Th width="23%">Address</Th>
+                  <Th width="15%">Value (USD)</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -120,3 +120,4 @@ export const AssetAccordion: React.FC<TableProps> = ({
   
   );
 };
+ 

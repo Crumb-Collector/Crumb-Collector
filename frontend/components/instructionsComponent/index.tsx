@@ -8,6 +8,9 @@ import {
 } from './utils'; // Update the import path accordingly
 import { AssetAccordion } from './table';
 import { useAccount } from 'wagmi';
+import { Button, ButtonGroup } from '@chakra-ui/react';
+import { ChakraProvider, Center, Input, useDisclosure} from '@chakra-ui/react';
+
 
 export default function InstructionsComponent() {
   const [address, setAddress] = useState<string>('');
@@ -25,16 +28,16 @@ export default function InstructionsComponent() {
   
 
   return (
+
     <div className={styles.container}>
       <header className={styles.header_container}>
         <div className={styles.header}>
           <h1>
-            <span>CRUMB COLLECTOR</span>
+            <span>OOPS!</span>
           </h1>
-          <h3>Pick up your mess! Collect those coins ...</h3>
+          <h3>Pick up your mess! Save those coins ...</h3>
         </div>
       </header>
-
       <div >
         <form 
           onSubmit={(event) =>
@@ -47,7 +50,10 @@ export default function InstructionsComponent() {
             )
           }
         >
-          <input
+          <Center>
+          <Input
+            w='430px'
+            m={2}
             type="text"
             value={address}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -55,9 +61,10 @@ export default function InstructionsComponent() {
             }
             placeholder="Enter wallet address"
           />
-          <button type="submit">
+          <Button colorScheme='teal' type="submit">
             Fetch Portfolio
-          </button>
+          </Button>
+          </Center>
         </form>
 
         {isLoading && <p>Loading...</p>}
@@ -73,9 +80,14 @@ export default function InstructionsComponent() {
             />
           </div>
         )}
+     
       </div>
+      {portfolio && (
+      <div >
       <div className={styles.header_container}><h3>Where you wanna send those <span>CUMMY COOKIES</span>?</h3></div>
-      <input
+      <Input
+            w='430px'
+            m={2}
             type="text"
             value={address}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -83,9 +95,11 @@ export default function InstructionsComponent() {
             }
             placeholder="Enter destination address"
           />
-          <button type="submit">
-            Send
-          </button>
+          <Button colorScheme='teal' type="submit">
+            Sumbit
+          </Button>
+      </div>
+      )}
     </div>
   );
 }
