@@ -3,7 +3,7 @@
 import { ChangeEvent, useState } from 'react';
 import styles from './page.module.css';
 import { PortfolioResponse } from './components/instructionsComponent/interfaces';
-import { handlePortfolioSubmit } from './utils/utils'; // Update the import path accordingly
+import { getPortfolio } from './utils/utils'; // Update the import path accordingly
 import { AssetTable } from './components/instructionsComponent/table';
 
 export default function Home() {
@@ -18,7 +18,7 @@ export default function Home() {
       <div>
         <form
           onSubmit={(event) =>
-            handlePortfolioSubmit(
+            getPortfolio(
               event,
               address,
               setIsLoading,

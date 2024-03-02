@@ -17,17 +17,17 @@ import {
   Td,
   Checkbox,
 } from '@chakra-ui/react';
-import { useAccount } from 'wagmi';
+import { useAccount, useWriteContract } from 'wagmi';
 import { formatHash } from '../../utils/utils';
+import { Address, erc20Abi as abi } from 'viem'
+import { useWaitForTransactionReceipt } from 'wagmi';
 
 interface TableProps {
   portfolioData: PortfolioResponse;
-  onConfirmSelection: (selectedAssets: Position[]) => void;
 }
 
 export const AssetAccordion: React.FC<TableProps> = ({
   portfolioData,
-  onConfirmSelection,
 }) => {
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
   const { isConnecting, isDisconnected } = useAccount();
@@ -64,22 +64,22 @@ export const AssetAccordion: React.FC<TableProps> = ({
       .map((positionId) => {
         const position = portfolioData.data.find((p) => p.id === positionId);
         return {
-          chainId: position?.relationships.chain.data.id || '',
+          chainId: position?.relationships?.chain?.data?.id ?? '',
           tokenAddress:
-            position?.attributes.fungible_info.implementations[0]?.address ||
+            position?.attributes?.fungible_info?.implementations[0]?.address ??
             'native-token',
         };
       });
 
     console.log('selectedAssets', selectedAssets);
-    onConfirmSelection(selectedAssets);
+    // sendSelectedTokens(selectedAssets);
   };
   const [selectedRowsByChain, setSelectedRowsByChain] = useState<
     Record<string, Record<string, boolean>>
   >({});
 
   const handleSelectAllChange = (chainId: string, isChecked: boolean) => {
-    const newSelectedRowsForChain = {};
+    const newSelectedRowsForChain: Record<string, boolean> = {};
     positionsByChain[chainId].forEach((position: Position) => {
       newSelectedRowsForChain[position.id] = isChecked;
     });
@@ -88,6 +88,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
       [chainId]: newSelectedRowsForChain,
     }));
   };
+
   const getSelectAllState = (chainId: string) => {
     const positions = positionsByChain[chainId];
     const selectedRows = selectedRowsByChain[chainId] || {};
@@ -96,6 +97,32 @@ export const AssetAccordion: React.FC<TableProps> = ({
       positions.some((position) => selectedRows[position.id]) && !allChecked;
     return { allChecked, isIndeterminate };
   };
+
+  const {
+    data: hash,
+    error,
+    isPending,
+    writeContract
+  } = useWriteContract()
+
+  async function sendTokens(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+    const address = formData.get('tokenAddress') as Address
+    const value = BigInt(formData.get('value') as string)
+    const destination = formData.get('destination') as Address
+    writeContract({
+      address,
+      abi,
+      functionName: 'transfer',
+      args: [destination, value],
+    })
+  }
+
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    })
 
   return (
     <Accordion allowToggle width="800px" m="20px">
@@ -156,9 +183,9 @@ export const AssetAccordion: React.FC<TableProps> = ({
                       {position.attributes.fungible_info.implementations[0]
                         ?.address
                         ? formatHash(
-                            position.attributes.fungible_info.implementations[0]
-                              .address
-                          )
+                          position.attributes.fungible_info.implementations[0]
+                            .address
+                        )
                         : 'N/A'}
                     </Td>
                     <Td>{position.attributes.value?.toFixed(2) || 'N/A'}</Td>
@@ -175,7 +202,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
             >
               {isConnecting || isDisconnected
                 ? 'CONNECT WALLET TO CONFIRM'
-                : 'Confirm Selection'}
+                : `Send Tokens on ${chainId}`}
             </Button>
           </AccordionPanel>
         </AccordionItem>

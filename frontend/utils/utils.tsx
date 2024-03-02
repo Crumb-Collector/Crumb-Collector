@@ -8,7 +8,7 @@ import { extractChainIdMapping } from './getChainMapping';
 import { replaceChainIdWithNumber } from './replaceChainIdWithNumber';
 import { Address } from 'viem';
 
-export const handlePortfolioSubmit = async (
+export const getPortfolio = async (
   event: React.FormEvent<HTMLFormElement>,
   address: Address,
   setIsLoading: (isLoading: boolean) => void,
@@ -132,7 +132,7 @@ export const handleConfirmSelection = async (selectedAssets: Position[]) => {
   // Use the Zerion info to update our "keyValueArray"
   const updatedArray = replaceChainIdWithNumber(keyValueArray, chainIdMapping);
 
-  console.log('updated array', updatedArray);
+  console.log('selected assets', updatedArray);
 
   // tokenAddresses.forEach(async (tokenAddress) => {
   //   await transferAllTokens(wallet, tokenAddress, recipient, chainId);
@@ -141,6 +141,7 @@ export const handleConfirmSelection = async (selectedAssets: Position[]) => {
   // TODO - replace recipient address
   // executeTokenTransfers(keyValueMap, 'RecipientAddress', wallet);
 };
+
 export function formatHash(hash: any, visibleCharacters: number = 6): string {
   if (typeof hash !== 'string' || hash.length <= visibleCharacters * 2) {
     return String(hash);
