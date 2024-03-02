@@ -16,9 +16,8 @@ import {
   Th,
   Td,
 } from '@chakra-ui/react';
-import { useAccount } from "wagmi";
-import { formatHash } from './utils';
-
+import { useAccount } from 'wagmi';
+import { formatHash } from '../../utils/utils';
 
 interface TableProps {
   portfolioData: PortfolioResponse;
@@ -61,7 +60,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
   };
 
   return (
-    <Accordion defaultIndex={[0]} maxW="800px" m="20px" >
+    <Accordion defaultIndex={[0]} maxW="800px" m="20px">
       {Object.entries(positionsByChain).map(([chainId, positions]) => (
         <AccordionItem key={chainId}>
           <h2>
@@ -102,21 +101,32 @@ export const AssetAccordion: React.FC<TableProps> = ({
                     <Td>{position.attributes.fungible_info.symbol}</Td>
                     <Td>
                       {position.attributes.fungible_info.implementations[0]
-                        ?.address ? formatHash(position.attributes.fungible_info.implementations[0].address) : 'N/A'}
+                        ?.address
+                        ? formatHash(
+                            position.attributes.fungible_info.implementations[0]
+                              .address
+                          )
+                        : 'N/A'}
                     </Td>
                     <Td>{position.attributes.value?.toFixed(2) || 'N/A'}</Td>
                   </Tr>
                 ))}
               </Tbody>
             </Table>
-            <Button mt={4} px={4} py={2} onClick={() => handleConfirmSelection(chainId)}
-              isDisabled={isConnecting || isDisconnected}>
-              {isConnecting || isDisconnected ? "CONNECT WALLET TO CONFIRM" : "Confirm Selection"}
+            <Button
+              mt={4}
+              px={4}
+              py={2}
+              onClick={() => handleConfirmSelection(chainId)}
+              isDisabled={isConnecting || isDisconnected}
+            >
+              {isConnecting || isDisconnected
+                ? 'CONNECT WALLET TO CONFIRM'
+                : 'Confirm Selection'}
             </Button>
           </AccordionPanel>
         </AccordionItem>
       ))}
     </Accordion>
-
   );
 };
