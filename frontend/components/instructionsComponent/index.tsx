@@ -36,7 +36,7 @@ export default function InstructionsComponent() {
       </header>
 
       <div >
-        <form
+        <form 
           onSubmit={(event) =>
             handlePortfolioSubmit(
               event,

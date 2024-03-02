@@ -79,7 +79,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
                   <Th style={{ width: '8%' }} >Select</Th>
                   <Th>Name</Th>
                   <Th>Symbol</Th>
-                  <Th style={{ width: '50%' }}>Address</Th>
+                  <Th>Address</Th>
                   <Th>Value (USD)</Th>
                 </Tr>
               </Thead>
@@ -109,9 +109,9 @@ export const AssetAccordion: React.FC<TableProps> = ({
                 ))}
               </Tbody>
             </Table>
-            <Button mt={4} onClick={() => handleConfirmSelection(chainId)}
+            <Button mt={4} px={4} py={2} onClick={() => handleConfirmSelection(chainId)}
             isDisabled={isConnecting || isDisconnected}>
-              Confirm Selection
+               {isConnecting || isDisconnected ? "CONNECT WALLET TO CONFIRM" : "Confirm Selection"}
             </Button>
           </AccordionPanel>
         </AccordionItem>
