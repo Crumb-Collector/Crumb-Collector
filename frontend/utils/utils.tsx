@@ -1,7 +1,6 @@
 'use client';
 
-import { PortfolioResponse } from '../components/instructionsComponent/interfaces';
-import { ethers } from 'ethers';
+import { PortfolioResponse, Position } from '../components/instructionsComponent/interfaces';
 import { extractChainIdMapping } from './getChainMapping';
 import { replaceChainIdWithNumber } from './replaceChainIdWithNumber';
 
@@ -86,11 +85,10 @@ export const handlePortfolioSubmit = async (
 // }
 
 export const extractTokenAddressToChainArray = (
-  portfolioResponse: PortfolioResponse
+  portfolioResponse: Position[]
 ): { address: string; chainId: string }[] => {
   const tokenAddressToChainArray: { address: string; chainId: string }[] = [];
-
-  portfolioResponse.data.forEach((position) => {
+  portfolioResponse.forEach((position) => {
     const chainId = position.relationships.chain.data.id;
     if (position.id.includes('base')) {
       // This is a native token, use a placeholder like "native-asset"
@@ -120,7 +118,7 @@ export const extractTokenAddressToChainArray = (
 };
 
 export const handleConfirmSelection = async (
-  selectedAssets: PortfolioResponse
+  selectedAssets: Position[]
 ) => {
   // Take the selectedAssets identified by the user and convert that information into a useful array.
   const keyValueArray: { address: string; chainId: string }[] =

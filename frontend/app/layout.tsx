@@ -8,6 +8,7 @@ import { config } from '@/config'
 import { ContextProvider } from '@/context'
 import Footer from '@/components/instructionsComponent/navigation/footer'
 import Navbar from '@/components/instructionsComponent/navigation/navbar'
+import { ChakraProvider } from '@chakra-ui/react'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -24,11 +25,13 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ContextProvider initialState={initialState}>
-          <div style={{ display: "flex", flexDirection: "column", minHeight: "105vh" }}>
-            <Navbar />
-            <div style={{ flexGrow: 1 }}>{children}</div>
-            <Footer />
-          </div>
+          <ChakraProvider>
+            <div style={{ display: "flex", flexDirection: "column", minHeight: "105vh" }}>
+              <Navbar />
+              <div style={{ flexGrow: 1 }}>{children}</div>
+              <Footer />
+            </div>
+          </ChakraProvider>
         </ContextProvider>
       </body>
     </html>

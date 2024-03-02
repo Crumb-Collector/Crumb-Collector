@@ -22,7 +22,7 @@ import { formatHash } from '../../utils/utils';
 interface TableProps {
   portfolioData: PortfolioResponse;
   onConfirmSelection: (
-    selectedAssets: Array<{ chainId: string; tokenAddress: string }>
+    selectedAssets: Position[]
   ) => void;
 }
 
@@ -51,11 +51,12 @@ export const AssetAccordion: React.FC<TableProps> = ({
           selectedRows[position.id] &&
           position.relationships.chain.data.id === chainId
       )
-      .map((position) => ({
-        chainId: position.relationships.chain.data.id,
-        tokenAddress:
-          position.attributes.fungible_info.implementations[0]?.address || '',
-      }));
+    // .map((position) => ({
+    //   chainId: position.relationships.chain.data.id,
+    //   tokenAddress:
+    //     position.attributes.fungible_info.implementations[0]?.address || '',
+    // }));
+    console.log("selected assets", selectedAssets);
     onConfirmSelection(selectedAssets);
   };
 
@@ -103,9 +104,9 @@ export const AssetAccordion: React.FC<TableProps> = ({
                       {position.attributes.fungible_info.implementations[0]
                         ?.address
                         ? formatHash(
-                            position.attributes.fungible_info.implementations[0]
-                              .address
-                          )
+                          position.attributes.fungible_info.implementations[0]
+                            .address
+                        )
                         : 'N/A'}
                     </Td>
                     <Td>{position.attributes.value?.toFixed(2) || 'N/A'}</Td>
