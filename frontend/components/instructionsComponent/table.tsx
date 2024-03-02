@@ -34,11 +34,12 @@ export const AssetAccordion: React.FC<TableProps> = ({
   const { isConnecting, isDisconnected } = useAccount();
 
   // Group positions by chain ID
-  const positionsByChain = portfolioData.data.reduce((acc: any, position) => {
+  var positionsByChain: Record<string, Position[]> = {};
+  portfolioData.data.forEach((position) => {
     const { id } = position.relationships.chain.data;
-    acc[id] = acc[id] ? [...acc[id], position] : [position];
-    return acc;
+    positionsByChain[id] = positionsByChain[id] ? [...positionsByChain[id], position] : [position];
   }, {});
+  console.log("positionsByChain", positionsByChain);
 
   const handleRowSelectionChange = (positionId: string, isChecked: boolean) => {
     setSelectedRows((prev) => ({ ...prev, [positionId]: isChecked }));
