@@ -22,12 +22,6 @@ export default function InstructionsComponent() {
     isDisconnected,
     isConnected,
   } = useAccount();
-  if (portfolio) {
-    console.log(
-      'Address to Chain Mapping:',
-      extractTokenAddressToChainArray(portfolio)
-    );
-  }
   useEffect(() => {
     // Check if wallet is connected and perform action
     if (isConnected && walletAddress) {
@@ -42,9 +36,9 @@ export default function InstructionsComponent() {
   }, [isConnected, walletAddress]);
 
   const mockEvent = {
-    preventDefault: () => {}, // Mock the preventDefault function
+    preventDefault: () => { }, // Mock the preventDefault function
     currentTarget: {
-      reset: () => {}, // Mock the reset function if used in your code
+      reset: () => { }, // Mock the reset function if used in your code
     },
   } as React.FormEvent<HTMLFormElement>;
 

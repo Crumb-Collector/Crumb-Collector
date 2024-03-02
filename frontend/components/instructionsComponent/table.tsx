@@ -22,7 +22,7 @@ import { formatHash } from '../../utils/utils';
 interface TableProps {
   portfolioData: PortfolioResponse;
   onConfirmSelection: (
-    selectedAssets: Array<{ chainId: string; tokenAddress: string }>
+    selectedAssets: Position[]
   ) => void;
 }
 
@@ -34,11 +34,12 @@ export const AssetAccordion: React.FC<TableProps> = ({
   const { isConnecting, isDisconnected } = useAccount();
 
   // Group positions by chain ID
-  const positionsByChain = portfolioData.data.reduce((acc: any, position) => {
+  var positionsByChain: Record<string, Position[]> = {};
+  portfolioData.data.forEach((position) => {
     const { id } = position.relationships.chain.data;
-    acc[id] = acc[id] ? [...acc[id], position] : [position];
-    return acc;
+    positionsByChain[id] = positionsByChain[id] ? [...positionsByChain[id], position] : [position];
   }, {});
+  console.log("positionsByChain", positionsByChain);
 
   const handleRowSelectionChange = (positionId: string, isChecked: boolean) => {
     setSelectedRows((prev) => ({ ...prev, [positionId]: isChecked }));
@@ -51,11 +52,12 @@ export const AssetAccordion: React.FC<TableProps> = ({
           selectedRows[position.id] &&
           position.relationships.chain.data.id === chainId
       )
-      .map((position) => ({
-        chainId: position.relationships.chain.data.id,
-        tokenAddress:
-          position.attributes.fungible_info.implementations[0]?.address || '',
-      }));
+    // .map((position) => ({
+    //   chainId: position.relationships.chain.data.id,
+    //   tokenAddress:
+    //     position.attributes.fungible_info.implementations[0]?.address || '',
+    // }));
+    console.log("selected assets", selectedAssets);
     onConfirmSelection(selectedAssets);
   };
 
@@ -103,9 +105,9 @@ export const AssetAccordion: React.FC<TableProps> = ({
                       {position.attributes.fungible_info.implementations[0]
                         ?.address
                         ? formatHash(
-                            position.attributes.fungible_info.implementations[0]
-                              .address
-                          )
+                          position.attributes.fungible_info.implementations[0]
+                            .address
+                        )
                         : 'N/A'}
                     </Td>
                     <Td>{position.attributes.value?.toFixed(2) || 'N/A'}</Td>
