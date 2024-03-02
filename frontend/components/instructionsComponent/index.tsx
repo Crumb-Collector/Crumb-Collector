@@ -15,12 +15,12 @@ export default function InstructionsComponent() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (portfolio) {
-    console.log(
-      'Address to Chain Mapping:',
-      extractTokenAddressToChainArray(portfolio)
-    );
-  }
+  // if (portfolio) {
+  //   console.log(
+  //     'Address to Chain Mapping:',
+  //     extractTokenAddressToChainArray(portfolio)
+  //   );
+  // }
 
   return (
     <div className={styles.container}>

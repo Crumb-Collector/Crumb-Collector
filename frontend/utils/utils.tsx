@@ -62,28 +62,28 @@ export const handlePortfolioSubmit = async (
 //   data: Position[];
 // }
 
-export interface PortfolioResponse {
-  data: Array<{
-    type: string;
-    id: string;
-    // ... other properties
-    relationships: {
-      chain: {
-        data: {
-          id: string;
-        };
-      };
-      // ... other properties
-    };
-    attributes: {
-      fungible_info: {
-        implementations: Array<{
-          address: string | null;
-        }>;
-      };
-    };
-  }>;
-}
+// export interface PortfolioResponse {
+//   data: Array<{
+//     type: string;
+//     id: string;
+//     // ... other properties
+//     relationships: {
+//       chain: {
+//         data: {
+//           id: string;
+//         };
+//       };
+//       // ... other properties
+//     };
+//     attributes: {
+//       fungible_info: {
+//         implementations: Array<{
+//           address: string | null;
+//         }>;
+//       };
+//     };
+//   }>;
+// }
 
 export const extractTokenAddressToChainArray = (
   portfolioResponse: PortfolioResponse
@@ -122,90 +122,24 @@ export const extractTokenAddressToChainArray = (
 export const handleConfirmSelection = async (
   selectedAssets: PortfolioResponse
 ) => {
-  console.log('Selected assets2:', selectedAssets);
-
-  // Parse the array into an array of
+  // Take the selectedAssets identified by the user and convert that information into a useful array.
   const keyValueArray: { address: string; chainId: string }[] =
     extractTokenAddressToChainArray(selectedAssets);
 
-  // console.log('keyValueMap xx', keyValueArray);
-  // Parse chainID name to number
-
-  // TODO - replace recipient address
-  // executeTokenTransfers(keyValueMap, 'RecipientAddress', wallet);
-
+  // Get the chainId info from the zerion endpoint
   const chainIdMapping = await extractChainIdMapping();
 
-  // console.log('chainIdMapping xx', chainIdMapping);
-
+  // Use the Zerion info to update our "keyValueArray"
   const updatedArray = replaceChainIdWithNumber(keyValueArray, chainIdMapping);
 
-  console.log(updatedArray);
+  console.log('updated array', updatedArray);
 
   // tokenAddresses.forEach(async (tokenAddress) => {
   //   await transferAllTokens(wallet, tokenAddress, recipient, chainId);
   // });
+
+  // TODO - replace recipient address
+  // executeTokenTransfers(keyValueMap, 'RecipientAddress', wallet);
 };
 
 // TODO -> consider: you might want to use a dedicated provider like Infura or Alchemy for better reliability and control over your RPC requests.
-
-interface TransferAllTokensParams {
-  wallet: ethers.Wallet; // User's wallet, connected to a provider
-  tokenAddress: string; // Contract address of the ERC20 token
-  recipient: string; // Recipient address
-  chainId: number; // Chain ID
-}
-
-async function transferAllTokens({
-  wallet,
-  tokenAddress,
-  recipient,
-  chainId,
-}: TransferAllTokensParams): Promise<ethers.ContractTransaction | undefined> {
-  const provider = ethers.getDefaultProvider(chainId);
-  wallet = wallet.connect(provider);
-
-  const erc20Abi = [
-    'function balanceOf(address owner) view returns (uint256)',
-    'function transfer(address to, uint amount) returns (bool)',
-  ];
-  const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, wallet);
-
-  // Fetch the current balance
-  const balance = await tokenContract.balanceOf(wallet.address);
-
-  // If balance is more than 0, proceed with the transfer
-  if (!balance.isZero()) {
-    const tx = await tokenContract.transfer(recipient, balance);
-    console.log(
-      `Transferring all tokens (${balance.toString()}) to ${recipient}`
-    );
-    return tx;
-  } else {
-    console.log('Balance is 0, no tokens to transfer.');
-    return undefined;
-  }
-}
-
-export async function executeTokenTransfers(
-  tokens: Record<string, number>,
-  recipient: string,
-  wallet: ethers.Wallet
-) {
-  for (const [tokenAddress, chainId] of Object.entries(tokens)) {
-    try {
-      const tx = await transferAllTokens({
-        wallet,
-        tokenAddress,
-        recipient,
-        chainId,
-      });
-
-      if (tx) {
-        console.log(`Transfer successful for token ${tokenAddress}`);
-      }
-    } catch (error) {
-      console.error(`Transfer failed for token ${tokenAddress}: ${error}`);
-    }
-  }
-}
