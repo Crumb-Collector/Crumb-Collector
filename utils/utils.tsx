@@ -1,14 +1,13 @@
 'use client';
 
+import { getPortfolio } from '@/app/actions';
 import {
   PortfolioResponse,
   Position,
 } from '../components/instructionsComponent/interfaces';
-import { extractChainIdMapping } from './getChainMapping';
-import { replaceChainIdWithNumber } from './replaceChainIdWithNumber';
 import { Address } from 'viem';
 
-export const getPortfolio = async (
+export const getPortfolioClient = async (
   event: React.FormEvent<HTMLFormElement>,
   address: Address,
   setIsLoading: (isLoading: boolean) => void,
@@ -18,30 +17,15 @@ export const getPortfolio = async (
   event.preventDefault(); // This should be the first line in your submit handler
   if (!address) return; // TODO - ETH ADDRESS VALIDATION or any other address validation
 
-  const options = {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      authorization: `Basic ${process.env.NEXT_PUBLIC_ZERION_API_DEV_KEY}`,
-    },
-  };
-
   setIsLoading(true);
   setError(null);
 
   try {
-    const response = await fetch(
-      // this sorts by dollar Value instead of by chain
-      // `https://api.zerion.io/v1/wallets/${address}/positions/?currency=usd&filter[trash]=only_non_trash&sort=value`,
-      `https://api.zerion.io/v1/wallets/${address}/positions/?currency=usd&filter[trash]=only_non_trash`,
-      options
-    );
-    if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
+    const portfolio = await getPortfolio(address);
+    if (!portfolio) {
+      throw new Error('No portfolio found');
     }
-    const data: PortfolioResponse = await response.json();
-    setPortfolio(data);
-    console.log("portfolio", data);
+    setPortfolio(portfolio);
   } catch (err) {
     console.error('PortfolioResponseError', err);
     setError(err instanceof Error ? err.message : String(err));
@@ -49,44 +33,6 @@ export const getPortfolio = async (
     setIsLoading(false);
   }
 };
-
-// interface Position {
-//   id: string;
-//   relationships: {
-//     chain: {
-//       data: {
-//         id: string;
-//       };
-//     };
-//   };
-// }
-
-// interface PortfolioResponse {
-//   data: Position[];
-// }
-
-// export interface PortfolioResponse {
-//   data: Array<{
-//     type: string;
-//     id: string;
-//     // ... other properties
-//     relationships: {
-//       chain: {
-//         data: {
-//           id: string;
-//         };
-//       };
-//       // ... other properties
-//     };
-//     attributes: {
-//       fungible_info: {
-//         implementations: Array<{
-//           address: string | null;
-//         }>;
-//       };
-//     };
-//   }>;
-// }
 
 export const extractTokenAddressToChainArray = (
   portfolioResponse: Position[]
@@ -119,27 +65,6 @@ export const extractTokenAddressToChainArray = (
   // console.log('mapping', tokenAddressToChainArray);
 
   return tokenAddressToChainArray;
-};
-
-export const handleConfirmSelection = async (selectedAssets: Position[]) => {
-  // Take the selectedAssets identified by the user and convert that information into a useful array.
-  const keyValueArray: { address: string; chainId: string }[] =
-    extractTokenAddressToChainArray(selectedAssets);
-
-  // Get the chainId info from the zerion endpoint
-  const chainIdMapping = await extractChainIdMapping();
-
-  // Use the Zerion info to update our "keyValueArray"
-  const updatedArray = replaceChainIdWithNumber(keyValueArray, chainIdMapping);
-
-  console.log('selected assets', updatedArray);
-
-  // tokenAddresses.forEach(async (tokenAddress) => {
-  //   await transferAllTokens(wallet, tokenAddress, recipient, chainId);
-  // });
-
-  // TODO - replace recipient address
-  // executeTokenTransfers(keyValueMap, 'RecipientAddress', wallet);
 };
 
 export function formatHash(hash: any, visibleCharacters: number = 6): string {

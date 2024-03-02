@@ -2,8 +2,7 @@ import styles from './instructionsComponent.module.css';
 import { ChangeEvent, useState, useEffect } from 'react';
 import { PortfolioResponse } from './interfaces';
 import {
-  extractTokenAddressToChainArray,
-  getPortfolio,
+  getPortfolioClient,
 } from '../../utils/utils'; // Update the import path accordingly
 import { AssetAccordion } from './table';
 import { useAccount } from 'wagmi';
@@ -25,7 +24,7 @@ export default function InstructionsComponent() {
   useEffect(() => {
     // Check if wallet is connected and perform action
     if (isConnected && walletAddress) {
-      getPortfolio(
+      getPortfolioClient(
         mockEvent,
         walletAddress,
         setIsLoading,
@@ -61,7 +60,7 @@ export default function InstructionsComponent() {
             {isConnecting || isDisconnected ? (
               <form
                 onSubmit={(event) =>
-                  getPortfolio(
+                  getPortfolioClient(
                     event,
                     address,
                     setIsLoading,
