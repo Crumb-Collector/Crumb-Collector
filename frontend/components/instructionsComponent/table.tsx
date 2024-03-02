@@ -55,19 +55,23 @@ export const AssetAccordion: React.FC<TableProps> = ({
       },
     }));
   };
-
   const handleConfirmSelection = (chainId: string) => {
-    const selectedAssets = portfolioData.data.filter(
-      (position) =>
-        selectedRows[position.id] &&
-        position.relationships.chain.data.id === chainId
-    );
-    // .map((position) => ({
-    //   chainId: position.relationships.chain.data.id,
-    //   tokenAddress:
-    //     position.attributes.fungible_info.implementations[0]?.address || '',
-    // }));
-    console.log('selected assets', selectedAssets);
+    // Ensure we're using the correct state to filter selected assets
+    const selectedPositions = selectedRowsByChain[chainId] || {};
+
+    const selectedAssets = Object.keys(selectedPositions)
+      .filter((positionId) => selectedPositions[positionId])
+      .map((positionId) => {
+        const position = portfolioData.data.find((p) => p.id === positionId);
+        return {
+          chainId: position?.relationships.chain.data.id || '',
+          tokenAddress:
+            position?.attributes.fungible_info.implementations[0]?.address ||
+            'native-token',
+        };
+      });
+
+    console.log('selectedAssets', selectedAssets);
     onConfirmSelection(selectedAssets);
   };
   const [selectedRowsByChain, setSelectedRowsByChain] = useState<
