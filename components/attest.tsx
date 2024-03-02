@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react'
 import { type BaseError, useWriteContract } from 'wagmi'
 import { Address, } from 'viem'
