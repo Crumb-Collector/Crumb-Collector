@@ -33,7 +33,7 @@ interface ChainData {
   }>;
 }
 
-async function extractChainIdMapping(): Promise<Record<string, number>> {
+export async function extractChainIdMapping(): Promise<Record<string, number>> {
   const idToExternalIdMap: Record<string, number> = {};
 
   //GET  ALL THAT DATA WE NEED TO CONVERT NAMES OF CHAINS TO CHAIN_IDS
@@ -64,8 +64,7 @@ async function extractChainIdMapping(): Promise<Record<string, number>> {
   return idToExternalIdMap;
 }
 
-// Example usage
-export async function getChainMapping() {
-  const chainIdMapping = await extractChainIdMapping();
-  console.log(chainIdMapping);
-}
+// // Example usage
+// export async function getChainMapping() {
+//   const chainIdMapping = await extractChainIdMapping();
+// }

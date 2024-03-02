@@ -2,7 +2,8 @@
 
 import { PortfolioResponse } from '../components/instructionsComponent/interfaces';
 import { ethers } from 'ethers';
-import { getChainMapping } from './getChainMapping';
+import { extractChainIdMapping } from './getChainMapping';
+import { replaceChainIdWithNumber } from './replaceChainIdWithNumber';
 
 export const handlePortfolioSubmit = async (
   event: React.FormEvent<HTMLFormElement>,
@@ -113,23 +114,33 @@ export const extractTokenAddressToChainArray = (
     }
   });
 
-  console.log('mapping', tokenAddressToChainArray);
+  // console.log('mapping', tokenAddressToChainArray);
 
   return tokenAddressToChainArray;
 };
 
-export const handleConfirmSelection = (selectedAssets: PortfolioResponse) => {
+export const handleConfirmSelection = async (
+  selectedAssets: PortfolioResponse
+) => {
   console.log('Selected assets2:', selectedAssets);
 
   // Parse the array into an array of
-  const keyValueMap: Record<string, string> =
+  const keyValueArray: { address: string; chainId: string }[] =
     extractTokenAddressToChainArray(selectedAssets);
 
+  // console.log('keyValueMap xx', keyValueArray);
   // Parse chainID name to number
 
   // TODO - replace recipient address
   // executeTokenTransfers(keyValueMap, 'RecipientAddress', wallet);
-  console.log('getChainMapping:', getChainMapping());
+
+  const chainIdMapping = await extractChainIdMapping();
+
+  // console.log('chainIdMapping xx', chainIdMapping);
+
+  const updatedArray = replaceChainIdWithNumber(keyValueArray, chainIdMapping);
+
+  console.log(updatedArray);
 
   // tokenAddresses.forEach(async (tokenAddress) => {
   //   await transferAllTokens(wallet, tokenAddress, recipient, chainId);
