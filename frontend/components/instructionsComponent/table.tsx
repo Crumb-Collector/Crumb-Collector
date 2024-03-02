@@ -60,7 +60,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
   };
 
   return (
-    <Accordion defaultIndex={[0]} maxW="800px" m="20px">
+    <Accordion allowToggle width="800px" m="20px">
       {Object.entries(positionsByChain).map(([chainId, positions]) => (
         <AccordionItem key={chainId}>
           <h2>
