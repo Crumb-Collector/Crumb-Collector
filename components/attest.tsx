@@ -1,10 +1,9 @@
-"use client";
 import * as React from 'react'
 import { type BaseError, useWriteContract } from 'wagmi'
 import { Address, } from 'viem'
 import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 
-const veraxSdk = new VeraxSdk(VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND);
+const veraxSdk = new VeraxSdk(VeraxSdk.DEFAULT_LINEA_TESTNET);
 
 export function SendAttestation() {
     const {
