@@ -75,3 +75,16 @@ export const handleConfirmSelection = (
   console.log('Selected assets:', selectedAssets);
   // Here you can further process the selected assets, e.g., storing them or making an API call
 };
+
+
+export function formatHash(hash: any, visibleCharacters: number = 6): string {
+  if (typeof hash !== 'string' || hash.length <= visibleCharacters * 2) {
+    return String(hash);
+  }
+
+  const start: string = hash.slice(0, visibleCharacters);
+  const end: string = hash.slice(-visibleCharacters);
+  const middle: string = '...';
+
+  return `${start}${middle}${end}`;
+}

@@ -14,5 +14,6 @@
 .asset_table th,
 .asset_table td {
   text-align: left;
-  width: 20%; /* Adjust the percentage based on the number of columns */
+  justify-content: center;
+  align-items: center;
 }

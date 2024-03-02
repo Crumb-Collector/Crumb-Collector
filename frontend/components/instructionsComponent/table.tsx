@@ -17,6 +17,7 @@ import {
   Td,
 } from '@chakra-ui/react';
 import { useAccount } from "wagmi";
+import { formatHash } from './utils';
 
 
 interface TableProps {
@@ -75,10 +76,10 @@ export const AssetAccordion: React.FC<TableProps> = ({
             <Table className={styles.asset_table}>
               <Thead>
                 <Tr>
-                  <Th>Select</Th>
+                  <Th style={{ width: '8%' }} >Select</Th>
                   <Th>Name</Th>
                   <Th>Symbol</Th>
-                  <Th>Address</Th>
+                  <Th style={{ width: '50%' }}>Address</Th>
                   <Th>Value (USD)</Th>
                 </Tr>
               </Thead>
@@ -101,7 +102,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
                     <Td>{position.attributes.fungible_info.symbol}</Td>
                     <Td>
                       {position.attributes.fungible_info.implementations[0]
-                        ?.address || 'N/A'}
+                        ?.address ? formatHash(position.attributes.fungible_info.implementations[0].address): 'N/A'}
                     </Td>
                     <Td>{position.attributes.value?.toFixed(2) || 'N/A'}</Td>
                   </Tr>
