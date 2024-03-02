@@ -7,12 +7,8 @@ import {
   handlePortfolioSubmit,
 } from '../../utils/utils'; // Update the import path accordingly
 import { AssetAccordion } from './table';
-import { Address, useAccount } from 'wagmi';
-import { Button, Input, Flex, Center } from '@chakra-ui/react'; // Added Flex
-import { ChakraProvider, useDisclosure, useToast } from '@chakra-ui/react';
 import { useAccount } from 'wagmi';
-import { Button, ButtonGroup } from '@chakra-ui/react';
-import { ChakraProvider, Center, Input, useDisclosure } from '@chakra-ui/react';
+import { Button, Input, Flex, Center } from '@chakra-ui/react'; // Added Flex
 
 export default function InstructionsComponent() {
   const [address, setAddress] = useState<string>('');
@@ -29,12 +25,12 @@ export default function InstructionsComponent() {
   if (portfolio) {
     console.log(
       'Address to Chain Mapping:',
-      extractTokenAddressToChainMap(portfolio)
+      extractTokenAddressToChainArray(portfolio)
     );
   }
   useEffect(() => {
     // Check if wallet is connected and perform action
-    if (isConnected) {
+    if (isConnected && walletAddress) {
       handlePortfolioSubmit(
         mockEvent,
         walletAddress,
