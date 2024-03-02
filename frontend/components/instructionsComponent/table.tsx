@@ -15,6 +15,7 @@ import {
   Tr,
   Th,
   Td,
+  Checkbox,
 } from '@chakra-ui/react';
 import { useAccount } from 'wagmi';
 import { formatHash } from '../../utils/utils';
@@ -40,23 +41,52 @@ export const AssetAccordion: React.FC<TableProps> = ({
     return acc;
   }, {});
 
-  const handleRowSelectionChange = (positionId: string, isChecked: boolean) => {
-    setSelectedRows((prev) => ({ ...prev, [positionId]: isChecked }));
+  const handleRowSelectionChange = (
+    chainId: string,
+    positionId: string,
+    isChecked: boolean
+  ) => {
+    setSelectedRowsByChain((prev) => ({
+      ...prev,
+      [chainId]: {
+        ...(prev[chainId] || {}),
+        [positionId]: isChecked,
+      },
+    }));
   };
 
   const handleConfirmSelection = (chainId: string) => {
-    const selectedAssets = portfolioData.data
-      .filter(
-        (position) =>
-          selectedRows[position.id] &&
-          position.relationships.chain.data.id === chainId
-      )
-      .map((position) => ({
-        chainId: position.relationships.chain.data.id,
-        tokenAddress:
-          position.attributes.fungible_info.implementations[0]?.address || '',
-      }));
+    const selectedPositions = positionsByChain[chainId].filter(
+      (position) => selectedRowsByChain[chainId]?.[position.id]
+    );
+    const selectedAssets = selectedPositions.map((position) => ({
+      chainId: position.relationships.chain.data.id,
+      tokenAddress:
+        position.attributes.fungible_info.implementations[0]?.address || '',
+    }));
     onConfirmSelection(selectedAssets);
+  };
+  const [selectedRowsByChain, setSelectedRowsByChain] = useState<
+    Record<string, Record<string, boolean>>
+  >({});
+
+  const handleSelectAllChange = (chainId: string, isChecked: boolean) => {
+    const newSelectedRowsForChain = {};
+    positionsByChain[chainId].forEach((position: Position) => {
+      newSelectedRowsForChain[position.id] = isChecked;
+    });
+    setSelectedRowsByChain((prev) => ({
+      ...prev,
+      [chainId]: newSelectedRowsForChain,
+    }));
+  };
+  const getSelectAllState = (chainId: string) => {
+    const positions = positionsByChain[chainId];
+    const selectedRows = selectedRowsByChain[chainId] || {};
+    const allChecked = positions.every((position) => selectedRows[position.id]);
+    const isIndeterminate =
+      positions.some((position) => selectedRows[position.id]) && !allChecked;
+    return { allChecked, isIndeterminate };
   };
 
   return (
@@ -75,7 +105,20 @@ export const AssetAccordion: React.FC<TableProps> = ({
             <Table className={styles.asset_table}>
               <Thead>
                 <Tr>
-                  <Th width="14%">Select</Th>
+                  <Th width="14%">
+                    {' '}
+                    <Checkbox
+                      isChecked={getSelectAllState(chainId).allChecked}
+                      isIndeterminate={
+                        getSelectAllState(chainId).isIndeterminate
+                      }
+                      onChange={(e) =>
+                        handleSelectAllChange(chainId, e.target.checked)
+                      }
+                    >
+                      Select
+                    </Checkbox>
+                  </Th>
                   <Th width="23%">Name</Th>
                   <Th width="15%">Symbol</Th>
                   <Th width="23%">Address</Th>
@@ -86,11 +129,13 @@ export const AssetAccordion: React.FC<TableProps> = ({
                 {positions.map((position: Position) => (
                   <Tr key={position.id}>
                     <Td>
-                      <input
-                        type="checkbox"
-                        checked={!!selectedRows[position.id]}
+                      <Checkbox
+                        isChecked={
+                          selectedRowsByChain[chainId]?.[position.id] || false
+                        }
                         onChange={(e) =>
                           handleRowSelectionChange(
+                            chainId,
                             position.id,
                             e.target.checked
                           )

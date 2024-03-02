@@ -1,13 +1,13 @@
 'use client';
 
 import { PortfolioResponse } from '../components/instructionsComponent/interfaces';
-import { ethers } from 'ethers';
 import { extractChainIdMapping } from './getChainMapping';
 import { replaceChainIdWithNumber } from './replaceChainIdWithNumber';
+import { Address } from 'viem';
 
 export const handlePortfolioSubmit = async (
   event: React.FormEvent<HTMLFormElement>,
-  address: string,
+  address: Address,
   setIsLoading: (isLoading: boolean) => void,
   setError: (error: string | null) => void,
   setPortfolio: (portfolio: PortfolioResponse | null) => void
