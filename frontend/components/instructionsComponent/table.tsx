@@ -67,7 +67,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
           <h2>
             <AccordionButton>
               <Box flex="1" textAlign="left" fontWeight="bold">
-               {chainId.charAt(0).toUpperCase() + chainId.slice(1)}
+                {chainId.charAt(0).toUpperCase() + chainId.slice(1)}
               </Box>
               <AccordionIcon />
             </AccordionButton>
@@ -102,7 +102,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
                     <Td>{position.attributes.fungible_info.symbol}</Td>
                     <Td>
                       {position.attributes.fungible_info.implementations[0]
-                        ?.address ? formatHash(position.attributes.fungible_info.implementations[0].address): 'N/A'}
+                        ?.address ? formatHash(position.attributes.fungible_info.implementations[0].address) : 'N/A'}
                     </Td>
                     <Td>{position.attributes.value?.toFixed(2) || 'N/A'}</Td>
                   </Tr>
@@ -110,14 +110,13 @@ export const AssetAccordion: React.FC<TableProps> = ({
               </Tbody>
             </Table>
             <Button mt={4} px={4} py={2} onClick={() => handleConfirmSelection(chainId)}
-            isDisabled={isConnecting || isDisconnected}>
-               {isConnecting || isDisconnected ? "CONNECT WALLET TO CONFIRM" : "Confirm Selection"}
+              isDisabled={isConnecting || isDisconnected}>
+              {isConnecting || isDisconnected ? "CONNECT WALLET TO CONFIRM" : "Confirm Selection"}
             </Button>
           </AccordionPanel>
         </AccordionItem>
       ))}
     </Accordion>
-  
+
   );
 };
- 
