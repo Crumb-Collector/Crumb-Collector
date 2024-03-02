@@ -41,7 +41,7 @@ export const getPortfolio = async (
     }
     const data: PortfolioResponse = await response.json();
     setPortfolio(data);
-    console.log(data);
+    console.log("portfolio", data);
   } catch (err) {
     console.error('PortfolioResponseError', err);
     setError(err instanceof Error ? err.message : String(err));

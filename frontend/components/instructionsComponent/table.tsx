@@ -24,10 +24,12 @@ import { useWaitForTransactionReceipt } from 'wagmi';
 
 interface TableProps {
   portfolioData: PortfolioResponse;
+  toAddress: Address
 }
 
 export const AssetAccordion: React.FC<TableProps> = ({
   portfolioData,
+  toAddress
 }) => {
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
   const { isConnecting, isDisconnected } = useAccount();
@@ -55,25 +57,7 @@ export const AssetAccordion: React.FC<TableProps> = ({
       },
     }));
   };
-  const handleConfirmSelection = (chainId: string) => {
-    // Ensure we're using the correct state to filter selected assets
-    const selectedPositions = selectedRowsByChain[chainId] || {};
 
-    const selectedAssets = Object.keys(selectedPositions)
-      .filter((positionId) => selectedPositions[positionId])
-      .map((positionId) => {
-        const position = portfolioData.data.find((p) => p.id === positionId);
-        return {
-          chainId: position?.relationships?.chain?.data?.id ?? '',
-          tokenAddress:
-            position?.attributes?.fungible_info?.implementations[0]?.address ??
-            'native-token',
-        };
-      });
-
-    console.log('selectedAssets', selectedAssets);
-    // sendSelectedTokens(selectedAssets);
-  };
   const [selectedRowsByChain, setSelectedRowsByChain] = useState<
     Record<string, Record<string, boolean>>
   >({});
@@ -105,24 +89,36 @@ export const AssetAccordion: React.FC<TableProps> = ({
     writeContract
   } = useWriteContract()
 
-  async function sendTokens(e: React.FormEvent<HTMLFormElement>) {
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
-    const address = formData.get('tokenAddress') as Address
-    const value = BigInt(formData.get('value') as string)
-    const destination = formData.get('destination') as Address
-    writeContract({
-      address,
-      abi,
-      functionName: 'transfer',
-      args: [destination, value],
+    const chainId = formData.get('chainId') as string
+    // Ensure we're using the correct state to filter selected assets
+    const selectedPositions = selectedRowsByChain[chainId] || {};
+    const selectedAssets = Object.keys(selectedPositions)
+      .filter((positionId) => selectedPositions[positionId])
+      .map((positionId) => {
+        const position = portfolioData.data.find((p) => p.id === positionId);
+        return {
+          chainId: position?.relationships?.chain?.data?.id ?? '',
+          tokenAddress:
+            position?.attributes?.fungible_info?.implementations[0]?.address ??
+            'native-token',
+          amount: position?.attributes?.quantity?.int ?? '0',
+        };
+      });
+
+    console.log('selectedAssets', selectedAssets);
+    selectedAssets.forEach((asset) => {
+      console.log('send asset to:', toAddress, "asset:", asset);
+      writeContract({
+        address: asset.tokenAddress as Address,
+        abi,
+        functionName: 'transfer',
+        args: [toAddress, BigInt(asset.amount)],
+      })
     })
   }
-
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    })
 
   return (
     <Accordion allowToggle width="800px" m="20px">
@@ -137,6 +133,20 @@ export const AssetAccordion: React.FC<TableProps> = ({
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
+            <form onSubmit={submit}>
+              <Button
+                mt={4}
+                px={4}
+                py={2}
+                isDisabled={isConnecting || isDisconnected || isPending}
+                type='submit'
+              >
+                {isConnecting || isDisconnected
+                  ? 'CONNECT WALLET TO CONFIRM'
+                  : isPending ? "tx pending" : `Send Tokens on ${chainId}`}
+              </Button>
+              <input type="hidden" name="chainId" value={chainId} />
+            </form>
             <Table className={styles.asset_table}>
               <Thead>
                 <Tr>
@@ -193,17 +203,6 @@ export const AssetAccordion: React.FC<TableProps> = ({
                 ))}
               </Tbody>
             </Table>
-            <Button
-              mt={4}
-              px={4}
-              py={2}
-              onClick={() => handleConfirmSelection(chainId)}
-              isDisabled={isConnecting || isDisconnected}
-            >
-              {isConnecting || isDisconnected
-                ? 'CONNECT WALLET TO CONFIRM'
-                : `Send Tokens on ${chainId}`}
-            </Button>
           </AccordionPanel>
         </AccordionItem>
       ))}

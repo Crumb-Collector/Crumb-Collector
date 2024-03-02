@@ -12,7 +12,7 @@ import { Address } from 'viem';
 
 export default function InstructionsComponent() {
   const [address, setAddress] = useState<Address>('0x');
-  const [toAddress, setToAddress] = useState<string>('');
+  const [toAddress, setToAddress] = useState<Address>('0x');
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -103,7 +103,6 @@ export default function InstructionsComponent() {
 
             {portfolio && (
               <form>
-                <input type="hidden" name="tokens" />
                 <Input
                   w="430px"
                   m={2}
@@ -111,13 +110,10 @@ export default function InstructionsComponent() {
                   name='toAddress'
                   value={toAddress}
                   onChange={(f: ChangeEvent<HTMLInputElement>) =>
-                    setToAddress(f.target.value)
+                    setToAddress(f.target.value as Address)
                   }
                   placeholder="Enter destination address"
                 />
-                <Button colorScheme="teal" width="130px" type="submit">
-                  Submit
-                </Button>
               </form>
             )}
           </Flex>
@@ -130,6 +126,7 @@ export default function InstructionsComponent() {
             {/* Render portfolio data here */}
             <AssetAccordion
               portfolioData={portfolio}
+              toAddress={toAddress}
             />
           </Center>
         </div>
